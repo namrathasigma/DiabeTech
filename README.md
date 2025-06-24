@@ -13,6 +13,150 @@ This project provides a complete database solution for diabetes management, incl
 
 ## Database Schema
 
+### Entity-Relationship (ER) Diagram
+
+```mermaid
+erDiagram
+    PATIENTS {
+        uuid patient_id PK
+        varchar mrn UK
+        varchar first_name
+        varchar last_name
+        date date_of_birth
+        varchar gender
+        varchar ethnicity
+        decimal height_cm
+        decimal weight_kg
+        decimal bmi
+        varchar phone
+        varchar email
+        text address
+        varchar emergency_contact_name
+        varchar emergency_contact_phone
+        varchar insurance_provider
+        varchar insurance_id
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PHENOTYPES {
+        int phenotype_id PK
+        varchar phenotype_name UK
+        text description
+        text criteria
+        varchar severity_level
+        timestamp created_at
+    }
+
+    PATIENT_PHENOTYPES {
+        int patient_phenotype_id PK
+        uuid patient_id FK
+        int phenotype_id FK
+        date assigned_date
+        decimal confidence_score
+        text notes
+        timestamp created_at
+    }
+
+    MEDICAL_HISTORY {
+        int history_id PK
+        uuid patient_id FK
+        varchar condition_name
+        date diagnosis_date
+        varchar status
+        varchar severity
+        text notes
+        timestamp created_at
+    }
+
+    LAB_RESULTS {
+        int lab_result_id PK
+        uuid patient_id FK
+        date test_date
+        varchar test_name
+        decimal test_value
+        varchar unit
+        decimal reference_range_low
+        decimal reference_range_high
+        boolean is_abnormal
+        text notes
+        timestamp created_at
+    }
+
+    GLUCOSE_READINGS {
+        int reading_id PK
+        uuid patient_id FK
+        timestamp reading_date
+        decimal glucose_value
+        varchar reading_type
+        varchar meal_context
+        text notes
+        timestamp created_at
+    }
+
+    MEDICATIONS {
+        int medication_id PK
+        varchar medication_name
+        varchar generic_name
+        varchar medication_class
+        varchar dosage_form
+        varchar strength
+        text description
+        timestamp created_at
+    }
+
+    PATIENT_MEDICATIONS {
+        int patient_medication_id PK
+        uuid patient_id FK
+        int medication_id FK
+        date prescribed_date
+        date start_date
+        date end_date
+        varchar dosage
+        varchar frequency
+        varchar route
+        varchar status
+        varchar prescribed_by
+        text notes
+        timestamp created_at
+    }
+
+    VITAL_SIGNS {
+        int vital_id PK
+        uuid patient_id FK
+        timestamp measurement_date
+        int systolic_bp
+        int diastolic_bp
+        int heart_rate
+        decimal temperature
+        int respiratory_rate
+        decimal oxygen_saturation
+        text notes
+        timestamp created_at
+    }
+
+    APPOINTMENTS {
+        int appointment_id PK
+        uuid patient_id FK
+        timestamp appointment_date
+        varchar appointment_type
+        varchar status
+        varchar provider_name
+        text notes
+        timestamp created_at
+    }
+
+    PATIENTS ||--o{ PATIENT_PHENOTYPES : "assigned to"
+    PHENOTYPES ||--o{ PATIENT_PHENOTYPES : "assigned to"
+    PATIENTS ||--o{ MEDICAL_HISTORY : "has"
+    PATIENTS ||--o{ LAB_RESULTS : "has"
+    PATIENTS ||--o{ GLUCOSE_READINGS : "has"
+    PATIENTS ||--o{ PATIENT_MEDICATIONS : "prescribed"
+    MEDICATIONS ||--o{ PATIENT_MEDICATIONS : "prescribed"
+    PATIENTS ||--o{ VITAL_SIGNS : "has"
+    PATIENTS ||--o{ APPOINTMENTS : "scheduled"
+```
+
 ### Core Tables
 
 1. **patients** - Patient demographics and contact information
@@ -190,8 +334,10 @@ diabets/
 ├── schema.sql              # Database schema definition
 ├── populate_database.py    # Data population script
 ├── setup_database.py       # Database setup script
+├── clean_database.py       # Database cleanup script
 ├── requirements.txt        # Python dependencies
 ├── env_example.txt         # Environment configuration example
+├── sample_queries.sql      # Example SQL queries
 └── README.md              # This file
 ```
 
