@@ -1,6 +1,6 @@
 # Database Configuration
 DB_HOST= localhost
 DB_NAME= diabetes_db
-DB_USER=namrathavpatil
-DB_PASSWORD=Namsangel@10
-DB_PORT=5431 
+DB_USER=<YOUR USERNAME>
+DB_PASSWORD=<YOUR PASSWORD>
+DB_PORT=<YOUR PORT> 
