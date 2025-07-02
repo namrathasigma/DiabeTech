@@ -1,9 +1,4 @@
 class DosingCalculator:
-    """
-    A collection of non-AI Python functions for safety-critical
-    medication dosing calculations. The logic herein is based on the
-    Lumina AI Health Institute's Medical Knowledge Base (Document 3).
-    """
 
     def __init__(self):
         # Data sourced from 'SGLT2 Inhibitor Profiles' in the knowledge base
