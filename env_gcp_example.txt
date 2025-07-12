@@ -1,0 +1,25 @@
+# GCP Cloud SQL Configuration
+# Copy this file to .env and fill in your values
+
+# Database Configuration
+DB_HOST=YOUR_INSTANCE_IP_ADDRESS
+DB_NAME=diabetes_db
+DB_USER=diabetes_user
+DB_PASSWORD=YOUR_USER_PASSWORD
+DB_PORT=5432
+
+# GCP Project Configuration
+GCP_PROJECT_ID=YOUR_GCP_PROJECT_ID
+GCP_INSTANCE_NAME=diabetes-db
+GCP_REGION=us-central1
+
+# Optional: Set these to avoid prompts during deployment
+GCP_ROOT_PASSWORD=YOUR_ROOT_PASSWORD
+GCP_USER_PASSWORD=YOUR_USER_PASSWORD
+
+# Example values (replace with your actual values):
+# DB_HOST=34.123.45.67
+# GCP_PROJECT_ID=my-diabetes-project-123456
+# DB_PASSWORD=secure_password_123
+# GCP_ROOT_PASSWORD=root_password_456
+# GCP_USER_PASSWORD=user_password_789 

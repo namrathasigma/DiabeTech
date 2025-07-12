@@ -260,97 +260,52 @@ The default configuration assumes:
 
 Modify the `.env` file or environment variables to match your setup.
 
+## Connecting to Google Cloud SQL PostgreSQL
+
+### 1. Set Up Your Environment
+
+- Ensure you have a `.env` file in your project root with the following variables:
+  ```env
+  DB_HOST=localhost           # Use 'localhost' when using Cloud SQL Proxy
+  DB_PORT=5432                # Or 5433 if you run the proxy on a different port
+  DB_NAME=diabetes_db         # Your database name
+  DB_USER=diabetes_user       # Your database user
+  DB_PASSWORD=your_password   # Your database password
+  ```
+
+### 2. Start Cloud SQL Proxy
+
+- Download and start the Cloud SQL Proxy:
+  ```bash
+  ./start_proxy.sh
+  # or manually:
+  ./cloud_sql_proxy -instances=YOUR_PROJECT_ID:YOUR_REGION:YOUR_INSTANCE_NAME=tcp:5432
+  ```
+- Make sure the port matches `DB_PORT` in your `.env`.
+
+### 3. Run Your Scripts
+
+- All Python scripts (`setup_database.py`, `populate_database.py`, etc.) will use the credentials from your `.env` file.
+- Example:
+  ```bash
+  python3 populate_database.py
+  ```
+
+### 4. Troubleshooting
+
+- **Connection refused or timed out:**
+  - Make sure Cloud SQL Proxy is running and listening on the correct port.
+  - Ensure your `.env` file matches the proxy settings.
+- **Authentication failed:**
+  - Double-check your `DB_USER` and `DB_PASSWORD` in both `.env` and the Cloud SQL Console.
+- **Database does not exist:**
+  - Make sure `DB_NAME` in `.env` matches the database name in your Cloud SQL instance.
+- **No data appears in GCP:**
+  - Confirm your script is using the correct `.env` and the proxy is running.
+  - Check for errors in the script output.
+
+For more details, see the Google Cloud SQL documentation: https://cloud.google.com/sql/docs/postgres/connect-admin-proxy
+
 ## Data Population
 
-The `populate_database.py` script creates:
-
-- **5 phenotypes** with detailed descriptions and criteria
-- **20 patients** (4 per phenotype) with realistic demographics
-- **Medical history** entries specific to each phenotype
-- **Lab results** with phenotype-appropriate values
-- **Glucose readings** for the past 30 days
-- **Vital signs** measurements
-- **Medication prescriptions** tailored to each phenotype
-
-### Sample Data Characteristics
-
-Each phenotype has distinct characteristics:
-
-- **Age distributions** appropriate for the condition
-- **BMI ranges** reflecting typical patient profiles
-- **Lab values** within realistic ranges for each phenotype
-- **Medication patterns** matching standard treatment protocols
-- **Glucose patterns** reflecting typical glycemic control
-
-## Query Examples
-
-### Patient Summary by Phenotype
-```sql
-SELECT 
-    ph.phenotype_name,
-    COUNT(p.patient_id) as patient_count,
-    AVG(p.bmi) as avg_bmi,
-    AVG(p.age) as avg_age
-FROM patients p
-JOIN patient_phenotypes pp ON p.patient_id = pp.patient_id
-JOIN phenotypes ph ON pp.phenotype_id = ph.phenotype_id
-GROUP BY ph.phenotype_name;
-```
-
-### Recent Glucose Readings
-```sql
-SELECT 
-    p.first_name,
-    p.last_name,
-    gr.glucose_value,
-    gr.reading_type,
-    gr.reading_date
-FROM patients p
-JOIN glucose_readings gr ON p.patient_id = gr.patient_id
-WHERE gr.reading_date >= CURRENT_DATE - INTERVAL '7 days'
-ORDER BY gr.reading_date DESC;
-```
-
-### Abnormal Lab Results
-```sql
-SELECT 
-    p.first_name,
-    p.last_name,
-    lr.test_name,
-    lr.test_value,
-    lr.unit,
-    lr.reference_range_low,
-    lr.reference_range_high
-FROM patients p
-JOIN lab_results lr ON p.patient_id = lr.patient_id
-WHERE lr.is_abnormal = true
-ORDER BY lr.test_date DESC;
-```
-
-## File Structure
-
-```
-diabets/
-├── schema.sql              # Database schema definition
-├── populate_database.py    # Data population script
-├── setup_database.py       # Database setup script
-├── clean_database.py       # Database cleanup script
-├── requirements.txt        # Python dependencies
-├── env_example.txt         # Environment configuration example
-├── sample_queries.sql      # Example SQL queries
-└── README.md              # This file
-```
-
-## Contributing
-
-This database schema is designed to be extensible. Consider adding:
-
-- Additional phenotype classifications
-- More detailed medication tracking
-- Comorbidity management
-- Treatment outcome tracking
-- Patient education and compliance data
-
-## License
-
-This project is provided as-is for educational and research purposes. Please ensure compliance with relevant healthcare data regulations when using in production environments. 
+The `populate_database.py`

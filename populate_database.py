@@ -15,17 +15,21 @@ from datetime import datetime, date, timedelta
 import uuid
 from faker import Faker
 import sys
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Initialize Faker for generating realistic data
 fake = Faker()
 
 # Database connection parameters
 DB_CONFIG = {
-    'host': 'localhost',
-    'database': 'diabetes_db',
-    'user': 'postgres',
-    'password': 'password',
-    'port': 5431
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'database': os.getenv('DB_NAME', 'diabetes_db'),
+    'user': os.getenv('DB_USER', 'postgres'),
+    'password': os.getenv('DB_PASSWORD', 'password'),
+    'port': int(os.getenv('DB_PORT', 5432))
 }
 
 def connect_to_db():
@@ -77,10 +81,23 @@ def insert_phenotypes(conn):
     
     for phenotype in phenotypes:
         cursor.execute("""
-            INSERT INTO phenotypes (phenotype_name, description, criteria, severity_level)
-            VALUES (%s, %s, %s, %s) RETURNING phenotype_id
-        """, (phenotype['name'], phenotype['description'], phenotype['criteria'], phenotype['severity']))
-        phenotype_ids[phenotype['name']] = cursor.fetchone()[0]
+            INSERT INTO phenotypes (phenotype_name, description, criteria, severity_level, created_at)
+            VALUES (%s, %s, %s, %s, %s)
+            ON CONFLICT (phenotype_name) DO NOTHING
+            RETURNING phenotype_id;
+        """, (
+            phenotype['name'],
+            phenotype['description'],
+            phenotype['criteria'],
+            phenotype['severity'],
+            datetime.now()
+        ))
+        result = cursor.fetchone()
+        if result:
+            phenotype_ids[phenotype['name']] = result[0]
+        else:
+            cursor.execute("SELECT phenotype_id FROM phenotypes WHERE phenotype_name = %s", (phenotype['name'],))
+            phenotype_ids[phenotype['name']] = cursor.fetchone()[0]
     
     conn.commit()
     cursor.close()
